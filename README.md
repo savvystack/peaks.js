@@ -1,4 +1,15 @@
-![Build Status](https://github.com/bbc/peaks.js/workflows/Node.js%20CI/badge.svg?branch=master)
+# Customization by Savvy Stack, Inc.
+
+This is a customized version of `peaks.js` as an internal tool for segment timing analysis. There is 
+no general purpose enhancements to the original code base.
+
+If bugs are found and fixes are made, they should have already been submitted as pull requests to the 
+original authors.
+
+Great thanks to the BBC R&D team for creating and sharing such a fantastic tool.
+
+---
+(original README)
 
 <p align="center">
   <a href="https://github.com/bbc/peaks.js"><img src="peaks-logo.svg" alt="Peaks.js" height="120" /></a>

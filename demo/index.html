@@ -82,7 +82,7 @@
         display: block;
         border-right: 2px solid #ccc;
         width: calc(100vw - 1100px);
-        max-width: 500px;
+        max-width: 550px;
         height: calc(100vh - 10px);
         overflow: scroll;
         box-sizing: border-box;
@@ -189,6 +189,7 @@
     <script src="peaks.js"></script>
     <script>
       const BACKEND_URL='http://localhost:4000';
+      let currentAsset;
 
       (function(Peaks) {
         var renderSegments = function(peaks) {
@@ -304,15 +305,6 @@
             renderPoints(peaksInstance);
           });
 
-          document.querySelector('button[data-action="save-data"]').addEventListener('click', function(event) {
-            const dataset = peaksInstance.segments.getSegments()
-              .map(segment => [
-                Math.round(segment.startTime * 1000) / 1000, 
-                Math.round(segment.endTime * 1000) / 1000
-              ])
-            console.log(JSON.stringify(dataset));
-          });
-
           document.querySelector('body').addEventListener('click', function(event) {
             var element = event.target;
             var action  = element.getAttribute('data-action');
@@ -357,15 +349,19 @@
             console.log('points.dragend:', point);
           });
 
+          peaksInstance.on('segments.dragend', function(segment) {
+            renderSegments(peaksInstance);
+          });
+          
           document.querySelector('#assets').addEventListener('click', function(event) {
             const row = event.target.closest('tr');
             for (let eachRow of row.parentNode.children)
               eachRow.classList.remove('selected');
             row.classList.add('selected');
-            const asset = row.children[0].innerHTML;
+            currentAsset = row.children[0].innerHTML;
 
             const source = {
-              mediaUrl: `${BACKEND_URL}/api/audio/sequence?seq=civics-en/${asset}`,
+              mediaUrl: `${BACKEND_URL}/api/audio/sequence?seq=civics-en/${currentAsset}`,
               webAudio: {
                 audioContext: audioContext
               },
@@ -378,7 +374,27 @@
             })
             peaksInstance.segments.removeAll();
             renderSegments(peaksInstance);
-          })
+          });
+
+          document.querySelector('button[data-action="save-data"]').addEventListener('click', function(event) {
+            const dataset = peaksInstance.segments.getSegments()
+              .map(segment => [
+                Math.round(segment.startTime * 1000) / 1000, 
+                Math.round(segment.endTime * 1000) / 1000
+              ])
+            console.log(JSON.stringify(dataset));
+            fetch(`${BACKEND_URL}/api/audio/timing`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ 
+                [currentAsset]: dataset
+              })
+            })
+              .then(response => response.json())
+              .then(timing => refreshAssetTableWithTiming(timing))
+          });
         });
       })(peaks);
 

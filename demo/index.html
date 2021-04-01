@@ -82,6 +82,7 @@
         display: block;
         border-right: 2px solid #ccc;
         width: calc(100vw - 1100px);
+        max-width: 500px;
         height: calc(100vh - 10px);
         overflow: scroll;
         box-sizing: border-box;
@@ -375,6 +376,8 @@
                 console.error('setSource error', error);
               }
             })
+            peaksInstance.segments.removeAll();
+            renderSegments(peaksInstance);
           })
         });
       })(peaks);
